@@ -1,0 +1,8 @@
+
+{
+  "name": "Blaise Tracker",
+  "description": "A sophisticated expense tracker with AI-powered financial insights, receipt scanning, and detailed visualizations.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
