@@ -1,38 +1,20 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { Transaction, SpendingInsight } from './types';
+import React, { useState, useEffect } from 'react';
+import { Transaction } from './types';
 import { STORAGE_KEY, CURRENCY_SYMBOL } from './constants';
-import { getSpendingInsights } from './services/geminiService';
 import { TransactionForm } from './components/TransactionForm';
 import { TransactionList } from './components/TransactionList';
 import { SpendingCharts } from './components/SpendingCharts';
-import { AIInsights } from './components/AIInsights';
 
 const App: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     return saved ? JSON.parse(saved) : [];
   });
-  const [insights, setInsights] = useState<SpendingInsight[]>([]);
-  const [loadingInsights, setLoadingInsights] = useState(false);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
   }, [transactions]);
-
-  const refreshInsights = useCallback(async () => {
-    if (transactions.length < 3) return;
-    setLoadingInsights(true);
-    const newInsights = await getSpendingInsights(transactions);
-    setInsights(newInsights);
-    setLoadingInsights(false);
-  }, [transactions]);
-
-  // Initial insights load
-  useEffect(() => {
-    refreshInsights();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const handleAddTransaction = (data: Omit<Transaction, 'id'>) => {
     const newTransaction: Transaction = {
@@ -104,17 +86,11 @@ const App: React.FC = () => {
 
         {/* Dashboard Content */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Left Column: Forms & List */}
+          {/* Left Column: Form & Charts */}
           <div className="lg:col-span-8 space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-               <TransactionForm onAdd={handleAddTransaction} />
-               <AIInsights 
-                insights={insights} 
-                loading={loadingInsights} 
-                onRefresh={refreshInsights} 
-               />
+            <div className="max-w-xl mx-auto lg:mx-0 w-full">
+              <TransactionForm onAdd={handleAddTransaction} />
             </div>
-            
             <SpendingCharts transactions={transactions} />
           </div>
 
@@ -130,7 +106,7 @@ const App: React.FC = () => {
       
       {/* Footer */}
       <footer className="mt-16 text-center text-slate-600 text-xs">
-        <p>© {new Date().getFullYear()} Blaise Financial Assistant. Powered by Gemini.</p>
+        <p>© {new Date().getFullYear()} Blaise Tracker. Minimalist Financial Management.</p>
       </footer>
     </div>
   );
